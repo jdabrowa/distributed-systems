@@ -1,0 +1,4 @@
+#ifndef C_CLIENT_CLIENT_H
+#define C_CLIENT_CLIENT_H
+
+#endif //C_CLIENT_CLIENT_H

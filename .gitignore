@@ -1,0 +1,13 @@
+*.class
+*.jar
+
+*.o
+*.a
+*.obj
+
+target/
+out/
+obj/
+
+.idea/
+*.iml
