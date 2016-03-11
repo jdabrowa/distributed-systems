@@ -1,4 +1,4 @@
-package com.jdabrowa.distributed.zad1;
+package com.jdabrowa.distributed.zad1.service;
 
 public interface Rfc3091Service {
 

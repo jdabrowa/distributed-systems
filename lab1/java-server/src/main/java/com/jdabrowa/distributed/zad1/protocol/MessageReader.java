@@ -1,12 +1,8 @@
 package com.jdabrowa.distributed.zad1.protocol;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
+import java.io.IOException;
 
-public class MessageReader {
+public interface MessageReader {
 
-    public Message readMessageFromStream(InputStream inputStream) {
-        BufferedInputStream
-    }
-
+    Message readMessage() throws IOException;
 }
