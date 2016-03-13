@@ -1,6 +1,5 @@
 package com.jdabrowa.distributed.zad1;
 
-import ch.qos.logback.classic.BasicConfigurator;
 import com.jdabrowa.distributed.zad1.math.MockCalculator;
 import com.jdabrowa.distributed.zad1.server.Rfc3091Server;
 import com.jdabrowa.distributed.zad1.server.ThreadedSocketServer;
@@ -17,6 +16,15 @@ public class ServerMain {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerMain.class);
 
+    private static final String PI_PORT_PROP_KEY = "com.jdabrowa.distributed.piPort";
+    private static final String THE_22_BY_7_PORT_PROP_KEY = "com.jdabrowa.distributed.approx22by7Port";
+    private final PropertiesLoader propertiesLoader;
+
+    public ServerMain(PropertiesLoader propertiesLoader) throws IOException {
+        this.propertiesLoader = propertiesLoader;
+        this.propertiesLoader.loadProperties();
+    }
+
     private void start() throws IOException {
 
         Rfc3091Server server = createServer();
@@ -25,8 +33,10 @@ public class ServerMain {
     }
 
     private void initializeServer(Rfc3091Server server) throws IOException {
-        server.bind22by7DigitGeneration(22333);
-        server.bindPiDigitGeneration(22444);
+        int _22By7PortNumber = Integer.valueOf(propertiesLoader.getProperty(THE_22_BY_7_PORT_PROP_KEY));
+        int piPortNumber = Integer.valueOf(propertiesLoader.getProperty(PI_PORT_PROP_KEY));
+        server.bind22by7DigitGeneration(_22By7PortNumber);
+        server.bindPiDigitGeneration(piPortNumber);
     }
 
     private Rfc3091Server createServer() {
@@ -37,7 +47,7 @@ public class ServerMain {
 
     public static void main(String[] args) throws IOException {
         LOGGER.info("Starting server...");
-        new ServerMain().start();
+        new ServerMain(new PropertiesLoader("configuration.properties")).start();
         LOGGER.info("Server started!");
     }
 }

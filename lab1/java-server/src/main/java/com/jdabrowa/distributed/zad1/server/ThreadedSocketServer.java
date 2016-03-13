@@ -62,21 +62,21 @@ public class ThreadedSocketServer implements Rfc3091Server {
             try {
                 handleConnection(socket, provider);
             } catch (IOException e) {
-                e.printStackTrace(); // TODO: ugly as fuck
+                LOGGER.warn("IOException during request handling", e); // TODO
             }
         }
     }
 
     private void handleConnection(ServerSocket socket, RunnableProvider provider) throws IOException {
         Socket incomingConnectionSocket = socket.accept();
-        LOGGER.debug("Got incoming connection, lulz!");
+        LOGGER.debug("Received incoming connection");
         AbstractWorkerRunnable runnableForIncomingConnection = wrapRequestAsRunnable(provider, incomingConnectionSocket);
         executor.execute(runnableForIncomingConnection);
     }
 
     private AbstractWorkerRunnable wrapRequestAsRunnable(RunnableProvider provider, Socket incomingConnectionSocket) throws IOException {
         AbstractWorkerRunnable runnableForIncomingConnection = createRunnableForIncomingConnection(incomingConnectionSocket, provider);
-        AfterActionCallback socketClosingCallback = getSocketClosingCallback(incomingConnectionSocket);
+        AfterActionCallback socketClosingCallback = socketClosingCallbackFor(incomingConnectionSocket);
         runnableForIncomingConnection.setAfterActionCallback(socketClosingCallback);
         return runnableForIncomingConnection;
     }
@@ -88,12 +88,12 @@ public class ThreadedSocketServer implements Rfc3091Server {
         return provider.createRunnable(reader, writer);
     }
 
-    private AfterActionCallback getSocketClosingCallback(Socket incomingConnectionSocket) {
+    private AfterActionCallback socketClosingCallbackFor(Socket incomingConnectionSocket) {
         return () -> {
             try {
                 incomingConnectionSocket.close();
             } catch (IOException e) {
-                e.printStackTrace(); // TODO
+                LOGGER.warn("IOException occurred during socket connection closing", e); // TODO
             }
         };
     }
