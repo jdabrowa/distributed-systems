@@ -1,11 +1,16 @@
 package com.jdabrowa.distributed.zad2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
 public class SocketReader {
+
+    Logger LOGGER = LoggerFactory.getLogger(SocketReader.class);
 
     private final Socket socket;
 
@@ -14,8 +19,10 @@ public class SocketReader {
     }
 
     public FileRequest readRequest() throws IOException {
+        LOGGER.debug("Reading file request");
         DataInputStream socketDataStream = inputDataStreamForSocket(socket);
         int requestLength = socketDataStream.readInt();
+        LOGGER.debug("Expecting {} ascii characters as image name", requestLength);
         String requestedFileName = readStringAsAsciiSequenceOfLength(socketDataStream, requestLength);
         return new FileRequest(requestedFileName);
     }

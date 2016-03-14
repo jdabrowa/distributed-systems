@@ -18,11 +18,12 @@ public class ServerMain {
 
     private static final String PI_PORT_PROP_KEY = "com.jdabrowa.distributed.piPort";
     private static final String THE_22_BY_7_PORT_PROP_KEY = "com.jdabrowa.distributed.approx22by7Port";
+    public static final String CONFIGURATION_PROPERTIES = "configuration.properties";
     private final PropertiesLoader propertiesLoader;
 
     public ServerMain(PropertiesLoader propertiesLoader) throws IOException {
         this.propertiesLoader = propertiesLoader;
-        this.propertiesLoader.loadProperties();
+        this.propertiesLoader.loadProperties(CONFIGURATION_PROPERTIES);
     }
 
     private void start() throws IOException {
@@ -47,7 +48,7 @@ public class ServerMain {
 
     public static void main(String[] args) throws IOException {
         LOGGER.info("Starting server...");
-        new ServerMain(new PropertiesLoader("configuration.properties")).start();
+        new ServerMain(new PropertiesLoader()).start();
         LOGGER.info("Server started!");
     }
 }
