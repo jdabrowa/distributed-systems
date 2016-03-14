@@ -18,12 +18,13 @@ public class ServerMain {
 
     private static final String PI_PORT_PROP_KEY = "com.jdabrowa.distributed.piPort";
     private static final String THE_22_BY_7_PORT_PROP_KEY = "com.jdabrowa.distributed.approx22by7Port";
-    public static final String CONFIGURATION_PROPERTIES = "configuration.properties";
+    public static final String CONFIGURATION_PROPERTIES_FILE = "configuration.properties";
+
     private final PropertiesLoader propertiesLoader;
 
     public ServerMain(PropertiesLoader propertiesLoader) throws IOException {
         this.propertiesLoader = propertiesLoader;
-        this.propertiesLoader.loadProperties(CONFIGURATION_PROPERTIES);
+        this.propertiesLoader.loadProperties(CONFIGURATION_PROPERTIES_FILE);
     }
 
     private void start() throws IOException {

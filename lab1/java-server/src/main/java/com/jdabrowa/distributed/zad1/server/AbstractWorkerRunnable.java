@@ -31,7 +31,7 @@ public abstract class AbstractWorkerRunnable implements Runnable {
         try {
             receiveAndReply();
         } catch (IOException ioException) {
-            // TODO: Log
+            LOGGER.warn("IOException on request", ioException);
         } finally {
             executeCallback();
         }
