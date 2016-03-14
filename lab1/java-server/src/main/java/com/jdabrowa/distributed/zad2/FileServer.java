@@ -30,6 +30,10 @@ public class FileServer {
         PropertiesLoader imagePropertiesLoader = new PropertiesLoader();
         ImageLoader loader = new ImageLoader(imagePropertiesLoader);
         LOGGER.info("FileServer initialized, awaiting requests");
+        enterListeningLoop(serverSocket, loader);
+    }
+
+    private void enterListeningLoop(ServerSocket serverSocket, ImageLoader loader) throws IOException {
         while(true) {
             Socket incommingConnectionSocket = serverSocket.accept();
             int localPort = incommingConnectionSocket.getLocalPort();

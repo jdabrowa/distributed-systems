@@ -10,6 +10,7 @@ import java.io.InputStream;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ImageLoaderTest {
 
@@ -40,6 +41,7 @@ public class ImageLoaderTest {
 
         // given
         String existingImageName = "home";
+        when(loader.getProperty("home")).thenReturn("home.jpg");
 
         // when
         InputStream inputStream = instance.loadImageAsStream(existingImageName);
