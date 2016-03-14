@@ -20,7 +20,7 @@ public class ChatClient {
         LOGGER.info("Starting chat threads...");
         receiverThread.start();
         senderThread.start();
-        LOGGER.info("Chat threads finished");
+        LOGGER.info("Chat threads started");
         senderThread.join();
         receiverThread.join();
     }
@@ -30,13 +30,11 @@ public class ChatClient {
             LOGGER.warn("One program argument required - user nick name (max. 6 characters)");
             throw new IllegalArgumentException("One program argument required - user nick name (max. 6 characters)");
         }
-        LOGGER.debug("Hejo");
         String nick = args[0];
-        InetAddress groupAddress = InetAddress.getByName("228.5.6.7");
+        InetAddress groupAddress = InetAddress.getByName("228.5.6.2");
         int portNumber = 26777;
         MulticastSocket socket = new MulticastSocket(portNumber);
         MessageReader reader = new MessageReader(socket);
-        LOGGER.debug("Juz prawie...");
         ChatConnector chatConnector = new ChatConnector(groupAddress, portNumber, socket, reader);
         ChatClient client = new ChatClient(chatConnector, nick);
     }

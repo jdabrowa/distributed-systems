@@ -37,7 +37,7 @@ public class ChatConnector {
     public void sendMessage(ChatMessage message) throws IOException {
         byte [] messageBytes = message.getBytes();
         byte [] messageWithCrc = appendChecksum(messageBytes);
-        DatagramPacket messagePacket = new DatagramPacket(messageWithCrc, 0, groupAddress, portNumber);
+        DatagramPacket messagePacket = new DatagramPacket(messageWithCrc, messageWithCrc.length, groupAddress, portNumber);
         LOGGER.debug("Sending packet with body: {}", Arrays.toString(messagePacket.getData()));
         socket.send(messagePacket);
     }

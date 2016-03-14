@@ -10,7 +10,7 @@
 
 
     <logger name="com.jdabrowa.distributed.zad2" level="INFO" />
-    <logger name="com.jdabrowa.distributed.zad3" level="DEBUG" />
+    <logger name="com.jdabrowa.distributed.zad3" level="INFO" />
 
     <logger name="com.jdabrowa.distributed.zad2.FileServer" level="DEBUG" />
     <logger name="com.jdabrowa.distributed.zad2.FileServerRunnable" level="DEBUG" />
