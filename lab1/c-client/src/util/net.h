@@ -9,5 +9,6 @@
 #include <strings.h>
 
 int create_and_connect_socket(const char *, int);
+uint32_t read_int(int);
 
 #endif //C_CLIENT_NET_H

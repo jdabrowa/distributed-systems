@@ -31,7 +31,7 @@ public class FileServerRunnable implements Runnable {
             LOGGER.warn("IOException during file request handling", e);
         } finally {
             long requestDuration = System.currentTimeMillis() - startTime;
-            LOGGER.debug("Request processing finished in {}", requestDuration);
+            LOGGER.debug("Request processing finished in {} ms", requestDuration);
         }
     }
 

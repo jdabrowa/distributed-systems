@@ -9,7 +9,10 @@
     </appender>
 
 
-    <logger name="com.jdabrowa.distributed.zad2" level="DEBUG" />
+    <logger name="com.jdabrowa.distributed.zad2" level="INFO" />
+
+    <logger name="com.jdabrowa.distributed.zad2.FileServer" level="DEBUG" />
+    <logger name="com.jdabrowa.distributed.zad2.FileServerRunnable" level="DEBUG" />
 
     <root level="debug">
         <appender-ref ref="STDOUT" />

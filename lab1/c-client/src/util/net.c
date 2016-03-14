@@ -10,3 +10,13 @@ int create_and_connect_socket(const char *addr, int port_no) {
     connect(fd, (struct sockaddr*) &serv_addr, sizeof(serv_addr));
     return fd;
 }
+
+uint32_t read_int(int socket_fd) {
+    char resp_buff[4];
+    int counter = 0;
+    while(counter < 4) {
+        int len = (int) recv(socket_fd, resp_buff+counter, 4-counter, 0);
+        counter += len;
+    }
+    return ntohl(*((uint32_t*)resp_buff));
+}
