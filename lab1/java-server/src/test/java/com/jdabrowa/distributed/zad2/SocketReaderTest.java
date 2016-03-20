@@ -47,11 +47,11 @@ public class SocketReaderTest {
     private byte[] prepareStreamContent() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(5);
         appendIntegerLiteralFourInNetworkEndianess(bos);
-        appendDupaInAsciiChars(bos);
+        appendAsciiChars(bos);
         return bos.toByteArray();
     }
 
-    private void appendDupaInAsciiChars(ByteArrayOutputStream bos) {
+    private void appendAsciiChars(ByteArrayOutputStream bos) {
         bos.write(0x44);
         bos.write(0x75);
         bos.write(0x70);
