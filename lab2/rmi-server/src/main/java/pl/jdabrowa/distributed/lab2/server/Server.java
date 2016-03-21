@@ -14,17 +14,20 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class Server extends UnicastRemoteObject implements GameServer {
 
     private static final long serialVersionUID = -7038858750924126231L;
 
-    private final List<GameClient> awaitingClients;
+    private final List<Board> awaitingClients;
+    private Map<Board, String> resultMap = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    public Server(List<GameClient> awaitingClients) throws RemoteException {
+    public Server(List<Board> awaitingClients) throws RemoteException {
         super();
         this.awaitingClients = awaitingClients;
     }
@@ -32,7 +35,7 @@ public class Server extends UnicastRemoteObject implements GameServer {
     @Override
     public List<Player> getFreePlayers() throws RemoteException {
 //        return awaitingClients.stream().map(GameClient::getPlayer).collect(Collectors.toList());
-        return null; // TODO
+        return null;
     }
 
     @Override
@@ -81,7 +84,39 @@ public class Server extends UnicastRemoteObject implements GameServer {
 
     @Override
     public String awaitOpponentAndStartGame(Board board) throws RemoteException {
-        throw new UnsupportedOperationException("Not yet implemented");
+        synchronized (awaitingClients) {
+            if(1 == awaitingClients.size()) {
+                Board otherBoard = awaitingClients.get(0);
+                GameImpl game = new GameImpl(otherBoard, board);
+                GameClient firstClient = new FirstClient("player-1", game);
+                GameClient secondClient = new SecondClient("player-2", game);
+
+                String fisrtIdentifier = RandomStringUtils.randomAlphabetic(10);
+                String secondIdentifier = RandomStringUtils.randomAlphabetic(10);
+
+                Registry registry = LocateRegistry.getRegistry();
+                GameClient firstStubClient = (GameClient) UnicastRemoteObject.exportObject(firstClient, 0);
+                GameClient secondStubClient = (GameClient) UnicastRemoteObject.exportObject(secondClient, 0);
+                registry.rebind(fisrtIdentifier, firstStubClient);
+                registry.rebind(secondIdentifier, secondStubClient);
+
+                resultMap.put(otherBoard, fisrtIdentifier);
+                awaitingClients.remove(0);
+
+                return secondIdentifier;
+            } else {
+                awaitingClients.add(board);
+            }
+        }
+
+        while(resultMap.get(board) == null) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultMap.get(board);
     }
 
     private Board generateRandomBoard() {   // https://xkcd.com/221/

@@ -19,7 +19,7 @@ import java.util.Scanner;
 
 public class GameClientApplication {
 
-    private static final String IP = "164.132.230.106";
+    private String IP = "164.132.230.106";
 
     private GameClientApplication() {
 
@@ -27,8 +27,10 @@ public class GameClientApplication {
 
     private void start(String ... args) throws GameConfigurationException, RemoteException, MalformedURLException, NotBoundException {
 
-        GameServer server = (GameServer) Naming.lookup("rmi://" + IP + ":1099/gameserver");
         new ConfigurationValidator().validateParams(args);
+        IP = args[0];
+
+        GameServer server = (GameServer) Naming.lookup("rmi://" + IP + ":1099/gameserver");
 
         GameType gameType = GameType.valueOf(args[1]);
         switch(gameType) {
@@ -100,24 +102,8 @@ public class GameClientApplication {
     }
 
     private void startGameWithOtherPlayer(GameServer server) throws RemoteException, MalformedURLException, NotBoundException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Available players: ");
-        List<Player> freePlayers = server.getFreePlayers();
-        listPlayers(freePlayers);
-        String playerNickToPlayWith = scanner.nextLine();
-        while(!freePlayers.contains(playerNickToPlayWith)) {
-            System.out.println("Player " + playerNickToPlayWith + " is not available, please choose one of available players:");
-            freePlayers = server.getFreePlayers();
-            listPlayers(freePlayers);
-            playerNickToPlayWith = scanner.nextLine();
-        }
-        Player player = null;
-        for(Player freePlayer : freePlayers) {
-            if(playerNickToPlayWith.equals(freePlayer.getNickName())) {
-                player = freePlayer;
-            }
-        }
-        String identifier = server.startNewGameWith(player, generateRandomBoard());
+
+        String identifier = server.awaitOpponentAndStartGame(generateRandomBoard());
         GameClient client = (GameClient) Naming.lookup("rmi://" + IP + ":1099/" + identifier);
 
         enterGameLoop(client);
