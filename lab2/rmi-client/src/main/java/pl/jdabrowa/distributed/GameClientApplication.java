@@ -19,6 +19,8 @@ import java.util.Scanner;
 
 public class GameClientApplication {
 
+    public static final int DEFAULT_RMI_PORT_NUMBER = 1099;
+    public static final String SERVER_LOCATOR = "gameserver";
     private String IP = "164.132.230.106";
 
     private GameClientApplication() {
@@ -30,7 +32,7 @@ public class GameClientApplication {
         new ConfigurationValidator().validateParams(args);
         IP = args[0];
 
-        GameServer server = (GameServer) Naming.lookup("rmi://" + IP + ":1099/gameserver");
+        GameServer server = (GameServer) Naming.lookup(buildRmiUrl(IP, DEFAULT_RMI_PORT_NUMBER, SERVER_LOCATOR));
 
         GameType gameType = GameType.valueOf(args[1]);
         switch(gameType) {
@@ -48,7 +50,7 @@ public class GameClientApplication {
     private void startGameWithBot(GameServer server) throws RemoteException, MalformedURLException, NotBoundException {
         Board board = generateRandomBoard();
         String identifier = server.startNewGameWithBot(board);
-        GameClient client = (GameClient) Naming.lookup("rmi://" + IP + ":1099/" + identifier);
+        GameClient client = (GameClient) Naming.lookup(buildRmiUrl(IP, DEFAULT_RMI_PORT_NUMBER, identifier));
         enterGameLoop(client);
     }
 
@@ -104,7 +106,8 @@ public class GameClientApplication {
     private void startGameWithOtherPlayer(GameServer server) throws RemoteException, MalformedURLException, NotBoundException {
 
         String identifier = server.awaitOpponentAndStartGame(generateRandomBoard());
-        GameClient client = (GameClient) Naming.lookup("rmi://" + IP + ":1099/" + identifier);
+//        GameClient client = (GameClient) Naming.lookup("rmi://" + IP + ":1099/" + identifier);
+        GameClient client = (GameClient) Naming.lookup(buildRmiUrl(IP, DEFAULT_RMI_PORT_NUMBER, identifier));
 
         enterGameLoop(client);
     }
@@ -115,7 +118,9 @@ public class GameClientApplication {
         }
     }
 
-
+    private String buildRmiUrl(String hostname, int portNumber, String identifier) {
+        return String.format("rmi://%s:%d/%s", hostname, portNumber, identifier);
+    }
 
     public static void main(String ... args) throws GameConfigurationException, RemoteException, MalformedURLException, NotBoundException {
         new GameClientApplication().start(args);
