@@ -20,7 +20,6 @@ public class ThreadPoolService implements Service{
 
     @Override
     public byte[] sendAndReceive(byte[] requestPayload) {
-
         MessageSendTask sendingTask = taskFactory.createTask(requestPayload);
         messageTaskTaskCoordinator.awaitCompletion(sendingTask);
         return messageTaskTaskCoordinator.retrieveResultOf(sendingTask.getUniqueId());
