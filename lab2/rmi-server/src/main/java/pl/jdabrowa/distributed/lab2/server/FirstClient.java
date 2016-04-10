@@ -1,32 +1,33 @@
 package pl.jdabrowa.distributed.lab2.server;
 
-import pl.jdabrowa.distributed.lab2.client.GameClient;
-import pl.jdabrowa.distributed.lab2.client.Player;
+import pl.jdabrowa.distributed.lab2.game.Board;
 import pl.jdabrowa.distributed.lab2.game.BoardFieldStatus;
-import pl.jdabrowa.distributed.lab2.game.Game;
 
-public class FirstClient implements GameClient {
+public class FirstClient extends AbstractClient {
 
-    private final Player player;
-    private final GameImpl game;
+    private static final long serialVersionUID = -1169235023056214771L;
 
     public FirstClient(String nick, GameImpl game) {
-        this.player = () -> nick;
-        this.game = game;
+        super(nick, game);
     }
 
     @Override
-    public Player getPlayer() {
-        return this.player;
+    public Board getOwnBoard() {
+        return asOwnBoard(game.getFirstPlayerBoard());
     }
 
     @Override
-    public Game getGame() {
-        return this.game;
+    public Board getOpponentBoard() {
+        return asOpponentBoard(game.getSecondPlayerBoard());
     }
 
     @Override
     public BoardFieldStatus tryShoot(int x, int y) {
-        return game.;
+        try {
+            return game.firstPlayerShoot(x, y);
+        } catch (InterruptedException e) {
+            e.printStackTrace(); // TODO
+            return null; // TODO
+        }
     }
 }

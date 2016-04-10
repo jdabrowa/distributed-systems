@@ -5,7 +5,7 @@ public enum BoardFieldStatus {
     UNKNOWN(" "),
     HIT("x"),
     MISS("."),
-    OWN_SHIP("*");
+    SHIP("*");
 
     BoardFieldStatus(String indicator) {
         this.indicator = indicator;
@@ -15,5 +15,20 @@ public enum BoardFieldStatus {
 
     public String getMark() {
         return indicator;
+    }
+
+    public static BoardFieldStatus fromString(String s) {
+        switch (s) {
+            case " ":
+                return UNKNOWN;
+            case "x":
+                return HIT;
+            case ".":
+                return MISS;
+            case "*":
+                return SHIP;
+            default:
+                return null;
+        }
     }
 }

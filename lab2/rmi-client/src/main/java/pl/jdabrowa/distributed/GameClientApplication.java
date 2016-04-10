@@ -1,38 +1,45 @@
 package pl.jdabrowa.distributed;
 
-import pl.jdabrowa.distributed.lab2.client.BoardImpl;
+import pl.jdabrowa.distributed.lab2.game.BoardImpl;
 import pl.jdabrowa.distributed.lab2.client.GameClient;
 import pl.jdabrowa.distributed.lab2.client.Player;
 import pl.jdabrowa.distributed.lab2.client.configuration.ConfigurationValidator;
 import pl.jdabrowa.distributed.lab2.client.exception.ExceptionMessages;
 import pl.jdabrowa.distributed.lab2.client.exception.GameConfigurationException;
 import pl.jdabrowa.distributed.lab2.game.Board;
-import pl.jdabrowa.distributed.lab2.game.Game;
 import pl.jdabrowa.distributed.lab2.game.GameType;
 import pl.jdabrowa.distributed.lab2.server.GameServer;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
 
 public class GameClientApplication {
 
+    public static final int DEFAULT_RMI_PORT_NUMBER = 1099;
+    public static final String SERVER_LOCATOR = "gameserver";
+    private String IP = "164.132.230.106";
 
     private GameClientApplication() {
 
     }
 
-    private void start(String ... args) throws GameConfigurationException, RemoteException {
+    private void start(String ... args) throws GameConfigurationException, RemoteException, MalformedURLException, NotBoundException {
 
-        GameServer server = null;
         new ConfigurationValidator().validateParams(args);
+        IP = args[0];
+
+        GameServer server = (GameServer) Naming.lookup(buildRmiUrl(IP, DEFAULT_RMI_PORT_NUMBER, SERVER_LOCATOR));
 
         GameType gameType = GameType.valueOf(args[1]);
         switch(gameType) {
-            case WITH_OTHER_PLAYER:
+            case PLAYER:
                 startGameWithOtherPlayer(server);
                 break;
-            case WITH_BOT:
+            case BOT:
                 startGameWithBot(server);
                 break;
             default:    // should not happen after validation
@@ -40,13 +47,14 @@ public class GameClientApplication {
         }
     }
 
-    private void startGameWithBot(GameServer server) throws RemoteException {
+    private void startGameWithBot(GameServer server) throws RemoteException, MalformedURLException, NotBoundException {
         Board board = generateRandomBoard();
-        GameClient client = server.startNewGameWithBot();
+        String identifier = server.startNewGameWithBot(board);
+        GameClient client = (GameClient) Naming.lookup(buildRmiUrl(IP, DEFAULT_RMI_PORT_NUMBER, identifier));
         enterGameLoop(client);
     }
 
-    private Board generateRandomBoard() {
+    private Board generateRandomBoard() {   // https://xkcd.com/221/
         return new BoardImpl(
                 "          ",
                 "  ***     ",
@@ -61,14 +69,14 @@ public class GameClientApplication {
         );
     }
 
-    private void enterGameLoop(GameClient client) {
+    private void enterGameLoop(GameClient client) throws RemoteException {
+
         int x, y;
         Scanner scanner = new Scanner(System.in);
 
-        Game game = client.getGame();
 
-        while(!game.isFinished()) {
-            printBoard(game);
+        while(!client.isGameFinished()) {
+            printBoards(client);
             System.out.println("Enter next shoot coords in form: x y");
             x = scanner.nextInt();
             y = scanner.nextInt();
@@ -76,10 +84,10 @@ public class GameClientApplication {
         }
     }
 
-    private void printBoard(Game game) {
+    private void printBoards(GameClient client) throws RemoteException {
 
-        Board yourBoard = game.getYourBoard();
-        Board opponentBoard = game.getOpponentBoard();
+        Board yourBoard = client.getOwnBoard();
+        Board opponentBoard = client.getOpponentBoard();
 
         for(int row = 0; row < yourBoard.getHeight(); ++row) {
             for(int col = 0; col < yourBoard.getWidth(); ++col) {
@@ -95,28 +103,13 @@ public class GameClientApplication {
         }
     }
 
-    private void startGameWithOtherPlayer(GameServer server) throws RemoteException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Available players: ");
-        List<Player> freePlayers = server.getFreePlayers();
-        listPlayers(freePlayers);
-        String playerNickToPlayWith = scanner.nextLine();
-        while(!freePlayers.contains(playerNickToPlayWith)) {
-            System.out.println("Player " + playerNickToPlayWith + " is not available, please choose one of available players:");
-            freePlayers = server.getFreePlayers();
-            listPlayers(freePlayers);
-            playerNickToPlayWith = scanner.nextLine();
-        }
-        Player player = null;
-        for(Player freePlayer : freePlayers) {
-            if(playerNickToPlayWith.equals(freePlayer.getNickName())) {
-                player = freePlayer;
-            }
-        }
-        NewGame newGame = server.startNewGameWith(player);
-        Game game = newGame.forClient(client);
+    private void startGameWithOtherPlayer(GameServer server) throws RemoteException, MalformedURLException, NotBoundException {
 
-        enterGameLoop(game);
+        String identifier = server.awaitOpponentAndStartGame(generateRandomBoard());
+//        GameClient client = (GameClient) Naming.lookup("rmi://" + IP + ":1099/" + identifier);
+        GameClient client = (GameClient) Naming.lookup(buildRmiUrl(IP, DEFAULT_RMI_PORT_NUMBER, identifier));
+
+        enterGameLoop(client);
     }
 
     private void listPlayers(List<Player> freePlayers) {
@@ -125,9 +118,11 @@ public class GameClientApplication {
         }
     }
 
+    private String buildRmiUrl(String hostname, int portNumber, String identifier) {
+        return String.format("rmi://%s:%d/%s", hostname, portNumber, identifier);
+    }
 
-
-    public static void main(String ... args) throws GameConfigurationException, RemoteException {
+    public static void main(String ... args) throws GameConfigurationException, RemoteException, MalformedURLException, NotBoundException {
         new GameClientApplication().start(args);
     }
 }

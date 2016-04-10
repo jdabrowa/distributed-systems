@@ -1,5 +1,7 @@
 package pl.jdabrowa.distributed.lab2.client;
 
-public interface Player {
+import java.io.Serializable;
+
+public interface Player extends Serializable {
     String getNickName();
 }

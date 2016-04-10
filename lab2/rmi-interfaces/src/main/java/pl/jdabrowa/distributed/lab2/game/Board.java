@@ -6,4 +6,5 @@ public interface Board {
     int getHeight();
 
     BoardFieldStatus getFiledStatus(int x, int y);
+    void setStatus(int x, int y, BoardFieldStatus newStatus);
 }

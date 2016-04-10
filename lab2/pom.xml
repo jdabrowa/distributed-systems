@@ -38,7 +38,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.6</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

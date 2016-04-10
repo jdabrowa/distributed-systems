@@ -1,9 +1,8 @@
-package pl.jdabrowa.distributed.lab2.client;
+package pl.jdabrowa.distributed.lab2.game;
 
-import pl.jdabrowa.distributed.lab2.game.Board;
-import pl.jdabrowa.distributed.lab2.game.BoardFieldStatus;
+import java.io.Serializable;
 
-public class BoardImpl implements Board {
+public class BoardImpl implements Board, Serializable {
 
     private final BoardFieldStatus [][] internalBoard;
     private final int width;
@@ -20,7 +19,7 @@ public class BoardImpl implements Board {
     private void translateRows(String ... rows) {
         for(int y = 0; y < rows.length; ++y) {
             for(int x = 0; x < rows[y].length(); ++x) {
-                internalBoard[y][x] = BoardFieldStatus.valueOf(String.valueOf(rows[y].charAt(x)));
+                internalBoard[y][x] = BoardFieldStatus.fromString(String.valueOf(rows[y].charAt(x)));
             }
         }
     }
@@ -47,5 +46,10 @@ public class BoardImpl implements Board {
     @Override
     public BoardFieldStatus getFiledStatus(int x, int y) {
         return internalBoard[y][x];
+    }
+
+    @Override
+    public void setStatus(int x, int y, BoardFieldStatus newStatus) {
+        this.internalBoard[y][x] = newStatus;
     }
 }
