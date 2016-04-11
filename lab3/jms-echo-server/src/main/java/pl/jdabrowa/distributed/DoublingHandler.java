@@ -1,8 +1,9 @@
 package pl.jdabrowa.distributed;
 
-public class EchoServerHandler extends ServerHandlerBase {
+public class DoublingHandler extends ServerHandlerBase {
+
     @Override
     protected String process(String request) {
-        return "Echo: " + request;
+        return request + " " + request;
     }
 }

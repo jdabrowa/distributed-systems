@@ -8,14 +8,22 @@ public class EchoServerMain {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EchoServerMain.class);
 
-    private void start(String queueName, String brokerLocator) throws Exception {
+    private void start(String echoQueueName, String twiceQueueName, String brokerLocator) throws Exception {
         new Broker(brokerLocator).start();
-        Server server = new Server(queueName, new EchoServerHandler());
+        Server echoServer = new Server(echoQueueName, new EchoServerHandler());
+        Server doubleServer = new Server(twiceQueueName, new DoublingHandler());
     }
 
     public static void main( String[] args ) throws Exception {
+
+        if(args.length != 2) {
+            String errorMessage = "Requires two arguments: queue names for echo queue and doubling queue";
+            LOGGER.warn(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
+
         LOGGER.info("Starting server");
-        new EchoServerMain().start("echoQueue", "tcp://localhost:61616");
+        new EchoServerMain().start(args[0], args[1], "tcp://localhost:61616");
         LOGGER.info("Server started");
     }
 }
