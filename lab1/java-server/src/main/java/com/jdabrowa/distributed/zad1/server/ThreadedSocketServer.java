@@ -62,7 +62,7 @@ public class ThreadedSocketServer implements Rfc3091Server {
             try {
                 handleConnection(socket, provider);
             } catch (IOException e) {
-                LOGGER.warn("IOException during request handling", e); // TODO
+                LOGGER.warn("IOException during request handling", e);
             }
         }
     }
