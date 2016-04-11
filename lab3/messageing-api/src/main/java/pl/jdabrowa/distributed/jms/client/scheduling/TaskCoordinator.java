@@ -6,7 +6,6 @@ import pl.jdabrowa.distributed.jms.client.tasks.MessageSendTask;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 
 @Component
 public class TaskCoordinator {
@@ -15,10 +14,10 @@ public class TaskCoordinator {
     private final Map<String, byte []> results;
 
     private final WaitObjectFactory waitObjectFactory;
-    private final Executor executor;
+    private final TaskExecutor executor;
 
     @Autowired
-    public TaskCoordinator(WaitObjectFactory waitObjectFactory, Executor executor) {
+    public TaskCoordinator(WaitObjectFactory waitObjectFactory, TaskExecutor executor) {
 
         this.waitObjects = new ConcurrentHashMap<>();
         this.results = new ConcurrentHashMap<>();
