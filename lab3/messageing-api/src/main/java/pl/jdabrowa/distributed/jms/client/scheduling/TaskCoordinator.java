@@ -6,6 +6,7 @@ import pl.jdabrowa.distributed.jms.client.tasks.MessageSendTask;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 @Component
 public class TaskCoordinator {
@@ -26,8 +27,8 @@ public class TaskCoordinator {
         this.executor = executor;
     }
 
-    public void awaitCompletion(MessageSendTask task) {
-        WaitObject waitObject = waitObjectFactory.createWaitObject();
+    public void awaitCompletion(MessageSendTask task, long timeoutMillis) throws TimeoutException {
+        WaitObject waitObject = waitObjectFactory.createWaitObject(timeoutMillis);
         waitObjects.put(task.getUniqueId(), waitObject);
         executor.execute(task);
         waitObject.await();

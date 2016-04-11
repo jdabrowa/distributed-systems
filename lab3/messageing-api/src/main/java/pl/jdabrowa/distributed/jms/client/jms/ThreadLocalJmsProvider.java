@@ -11,11 +11,9 @@ import javax.jms.Destination;
 public class ThreadLocalJmsProvider {
 
     private final ThreadLocal<JmsService> threadLocalService;
-    private final Destination destination;
 
     @Autowired
-    public ThreadLocalJmsProvider(ConnectionFactory connectionFactory, JmsServiceCreatingStrategy jmsServiceStrategy, Destination destination) {
-        this.destination = destination;
+    public ThreadLocalJmsProvider(ConnectionFactory connectionFactory, JmsServiceCreatingStrategy jmsServiceStrategy) {
         threadLocalService = createThreadLocal(jmsServiceStrategy, connectionFactory);
     }
 
@@ -32,7 +30,7 @@ public class ThreadLocalJmsProvider {
             @Override
             public JmsService initialValue() {
                 try {
-                    return strategy.createService(factory, destination);
+                    return strategy.createService(factory);
                 } catch (MessagingException e) {
                     throw new RuntimeException("Failed to create service", e);
                 }

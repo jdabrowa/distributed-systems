@@ -7,6 +7,8 @@ import pl.jdabrowa.distributed.jms.client.error.MessagingException;
 import pl.jdabrowa.distributed.jms.client.tasks.MessageSendTask;
 import pl.jdabrowa.distributed.jms.client.tasks.SendTaskFactory;
 
+import java.util.concurrent.TimeoutException;
+
 @Component
 public class ThreadPoolService implements Service{
 
@@ -20,9 +22,17 @@ public class ThreadPoolService implements Service{
     }
 
     @Override
-    public byte[] sendAndReceive(byte[] requestPayload) throws MessagingException {
+    public byte[] sendAndReceive(byte[] requestPayload, long timeoutMillis) throws MessagingException {
         MessageSendTask sendingTask = taskFactory.createTask(requestPayload);
-        messageTaskTaskCoordinator.awaitCompletion(sendingTask);
+        awaitWithTimeoutHandling(timeoutMillis, sendingTask);
         return messageTaskTaskCoordinator.retrieveResultOf(sendingTask.getUniqueId());
+    }
+
+    private void awaitWithTimeoutHandling(long timeoutMillis, MessageSendTask sendingTask) throws MessagingException {
+        try {
+            messageTaskTaskCoordinator.awaitCompletion(sendingTask, timeoutMillis);
+        } catch (TimeoutException e) {
+            throw new MessagingException("Request timed out", e);
+        }
     }
 }

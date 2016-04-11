@@ -1,29 +1,29 @@
 package pl.jdabrowa.distributed.jms.client.jms;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import pl.jdabrowa.distributed.jms.client.error.MessagingException;
 
 import javax.jms.*;
 
-@Component
 public class JmsService {
+
+    private static final String QUEUE_NAME = "myQueue";
 
     private final Session session;
     private final MessageProducer producer;
     private final Destination returnQueue;
 
-    @Autowired
-    public JmsService(Connection connection, Destination destination, HandlerFactory handlerFactory) throws MessagingException {
+    public JmsService(Connection connection, HandlerFactory handlerFactory) throws MessagingException {
 
         try {
-            this.session = connection.createSession();
+            this.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            connection.start();
+
             this.returnQueue = session.createTemporaryQueue();
+            Destination destination = this.session.createQueue(QUEUE_NAME);
             this.producer = session.createProducer(destination);
 
             registerReturnQueueHandler(handlerFactory);
 
-            connection.start();
         } catch (JMSException e) {
             throw new MessagingException("Error on creating session", e);
         }

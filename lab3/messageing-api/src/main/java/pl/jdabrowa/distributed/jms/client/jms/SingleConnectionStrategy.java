@@ -21,9 +21,9 @@ public class SingleConnectionStrategy implements JmsServiceCreatingStrategy {
     }
 
     @Override
-    public JmsService createService(ConnectionFactory factory, Destination destination) throws MessagingException {
+    public JmsService createService(ConnectionFactory factory) throws MessagingException {
         createAndCacheConnectionIfNull(factory);
-        return new JmsService(cachedConnection, destination, handlerFactory);
+        return new JmsService(cachedConnection, handlerFactory);
     }
 
     private void createAndCacheConnectionIfNull(ConnectionFactory factory) throws MessagingException {
