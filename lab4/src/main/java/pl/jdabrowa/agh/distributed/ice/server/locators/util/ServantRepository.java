@@ -1,4 +1,4 @@
-package pl.jdabrowa.agh.distributed.ice.server;
+package pl.jdabrowa.agh.distributed.ice.server.locators.util;
 
 import Ice.Object;
 

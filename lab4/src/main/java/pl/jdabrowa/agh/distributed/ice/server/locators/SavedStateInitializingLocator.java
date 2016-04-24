@@ -4,7 +4,7 @@ import Ice.*;
 import Ice.Object;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.jdabrowa.agh.distributed.ice.server.ServantRepository;
+import pl.jdabrowa.agh.distributed.ice.server.locators.util.ServantRepository;
 
 import java.util.function.Supplier;
 
@@ -15,6 +15,7 @@ public class SavedStateInitializingLocator implements ServantLocator {
     private final ServantRepository servantRepository;
 
     public SavedStateInitializingLocator(ServantRepository repository) {
+        LOGGER.trace("Instantiating {}", this.getClass().getSimpleName());
         this.servantRepository = repository;
     }
 

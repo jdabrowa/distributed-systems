@@ -14,8 +14,17 @@ public class SimpleOperationServant extends _SimpleStringOperationDisp {
     @Getter
     private final Date createTime;
 
+    @Getter
+    private final int id;
+
     public SimpleOperationServant() {
         this.createTime = new Date();
+        this.id = servantId.updateAndGet(oldId -> ++oldId);
+    }
+
+    SimpleOperationServant(Date createTime, int id) {
+        this.createTime = createTime;
+        this.id = id;
     }
 
     @Override
