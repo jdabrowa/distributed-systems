@@ -106,7 +106,6 @@ public class GameClientApplication {
     private void startGameWithOtherPlayer(GameServer server) throws RemoteException, MalformedURLException, NotBoundException {
 
         String identifier = server.awaitOpponentAndStartGame(generateRandomBoard());
-//        GameClient client = (GameClient) Naming.lookup("rmi://" + IP + ":1099/" + identifier);
         GameClient client = (GameClient) Naming.lookup(buildRmiUrl(IP, DEFAULT_RMI_PORT_NUMBER, identifier));
 
         enterGameLoop(client);

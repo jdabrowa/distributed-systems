@@ -3,6 +3,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <stdint.h>
+#include <stdint-gcc.h>
+#include <stdlib.h>
 #include "net.h"
 
 static uint64_t htonll(uint64_t hll) {
@@ -28,8 +31,18 @@ int main(int argc, char *argv[]) {
     char recvline[4];
     char sendline[1+2+4+8];
 
+    if(argc != 5) {
+        printf("Expected 4 arguments: 1-, 2-, 4- and 8-byte numbers\n");
+        exit(-1);
+    }
+
+    int one_byte = atoi(argv[1]);
+    int two_byte = atoi(argv[2]);
+    int four_byte = atoi(argv[3]);
+    long long int eight_byte = atoll(argv[4]);
+
     fd = create_and_connect_socket("127.0.0.1", 22333);
-    compose_message(-1, -2, -3, -4, sendline);
+    compose_message(one_byte, two_byte, four_byte, eight_byte, sendline);
 
     len = (int) send(fd, sendline, 15, 0);
     len = (int) recv(fd, recvline, 4, 0);
