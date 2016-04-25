@@ -1,10 +1,9 @@
 package pl.jdabrowa.agh.distributed.ice.server;
 
-import Ice.Communicator;
-import Ice.ObjectAdapter;
-import Ice.ServantLocator;
+import Ice.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.jdabrowa.agh.distributed.ice.server.locators.PooledLocator;
 import pl.jdabrowa.agh.distributed.ice.util.IceConfigurator;
 import pl.jdabrowa.agh.distributed.ice.error.IceError;
 import pl.jdabrowa.agh.distributed.ice.server.configuration.CategoryConstants;
@@ -28,9 +27,16 @@ public class SimpleServer {
         this.objectAdapter = iceCommunicator.createObjectAdapter(ICE_OBJECT_ADAPTER_PROPERTY_KEY);
         validateAdapterNotNull();
         setLocators();
+        addDefaultServants();
         objectAdapter.activate();
         LOGGER.info("Server awaiting requests...");
         iceCommunicator.waitForShutdown();
+    }
+
+    private void addDefaultServants() {
+        LOGGER.trace("Setting default servant for category 4");
+        Ice.Object defaultServant = new SimpleOperationServant();
+        objectAdapter.addDefaultServant(defaultServant, CategoryConstants.DEFAULT_SERVANT);
     }
 
     private void setLocators() {
@@ -41,6 +47,9 @@ public class SimpleServer {
 
         ServantLocator perRequestLocator = new PerRequestLocator();
         setLocatorForCategory(perRequestLocator, CategoryConstants.NEW_SERVANT_PER_REQUEST);
+
+        ServantLocator lruLocator = new PooledLocator(5);
+        setLocatorForCategory(lruLocator, CategoryConstants.LRU_SERVANT_POOL);
     }
 
     private void setLocatorForCategory(ServantLocator locator, String category) {
