@@ -8,9 +8,7 @@ import pl.jdabrowa.agh.distributed.ice.server.locators.util.ServantRepository;
 
 import java.util.function.Supplier;
 
-public class SavedStateInitializingLocator implements ServantLocator {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SavedStateInitializingLocator.class);
+public class SavedStateInitializingLocator extends LocatorBase {
 
     private final ServantRepository servantRepository;
 
@@ -24,17 +22,11 @@ public class SavedStateInitializingLocator implements ServantLocator {
     @Override
     public Object locate(Current current, LocalObjectHolder localObjectHolder) throws UserException {
         LOGGER.trace("Received request for persisted servant");
-        return servantProvider.get();
-    }
-
-    @Override
-    public void finished(Current current, Object object, java.lang.Object o) throws UserException {
-
-    }
-
-    @Override
-    public void deactivate(String s) {
-
+        Identity id = current.id;
+        LOGGER.trace("Request params: category - {}, name - {}", id.category, id.name);
+        Object servant = servantProvider.get();
+        current.adapter.add(servant, id);
+        return servant;
     }
 
     private synchronized Object virtualProxy() {
