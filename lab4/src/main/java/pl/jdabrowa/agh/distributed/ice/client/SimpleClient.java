@@ -4,6 +4,7 @@ import Ice.Communicator;
 import Ice.ObjectPrx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.jdabrowa.agh.distributed.ice.util.IceConfigurator;
 import pl.jdabrowa.agh.distributed.ice.error.IceError;
 import pl.jdabrowa.agh.distributed.ice.generated.Ex1.SimpleStringOperationPrx;
 import pl.jdabrowa.agh.distributed.ice.generated.Ex1.SimpleStringOperationPrxHelper;
@@ -15,12 +16,14 @@ public class SimpleClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleClient.class);
 
     private static final String ICE_CLIENT_PROPERTY_KEY = "pl.jdabrowa.agh.distributed.ice.client.SimpleClient.Proxy";
+    private static final String CONFIGURATION_FILE_NAME = "ice-client.properties";
 
     private final SimpleStringOperationPrx simpleStringOperationProxy;
 
     public SimpleClient(String ... args) throws IceError {
         LOGGER.info("Initializing ICE");
-        Communicator communicator = Ice.Util.initialize(args);
+        String [] iceArgs = new IceConfigurator().addConfiguration(args, CONFIGURATION_FILE_NAME);
+        Communicator communicator = Ice.Util.initialize(iceArgs);
         LOGGER.info("ICE initialized");
         LOGGER.info("Creating proxy for Simple String operations...");
         ObjectPrx rawSimpleStringOperationProxy = communicator.propertyToProxy(ICE_CLIENT_PROPERTY_KEY);

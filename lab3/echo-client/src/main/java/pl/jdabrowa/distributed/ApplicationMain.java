@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import pl.jdabrowa.distributed.jms.client.Service;
 import pl.jdabrowa.distributed.jms.client.ServiceFactory;
 
+import java.util.Scanner;
+
 @Component
 public class ApplicationMain implements CommandLineRunner {
 
@@ -23,7 +25,12 @@ public class ApplicationMain implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         LOGGER.info("Starting main application...");
         Service service = serviceFactory.createService(null);
-        byte[] bytes = service.sendAndReceive("dupa".getBytes(), 1000);
-        LOGGER.info("Received response: " + new String(bytes));
+        Scanner scanner = new Scanner(System.in);
+        while(true){
+            LOGGER.info("Enter message");
+            String msg = scanner.nextLine();
+            byte[] bytes = service.sendAndReceive(msg.getBytes(), 1000);
+            LOGGER.info("Received response: " + new String(bytes));
+        }
     }
 }
