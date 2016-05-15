@@ -1,7 +1,6 @@
 package pl.jdabrowa.agh.distributed.ice.server;
 
 import Ice.Communicator;
-import Ice.Identity;
 import Ice.ObjectAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
