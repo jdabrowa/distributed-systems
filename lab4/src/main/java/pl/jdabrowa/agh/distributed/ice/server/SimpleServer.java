@@ -34,7 +34,7 @@ public class SimpleServer {
     }
 
     private void addDefaultServants() {
-        LOGGER.trace("Setting default servant for category 4");
+        LOGGER.trace("Setting default servant for category {}", CategoryConstants.DEFAULT_SERVANT);
         Ice.Object defaultServant = new SimpleOperationServant();
         objectAdapter.addDefaultServant(defaultServant, CategoryConstants.DEFAULT_SERVANT);
     }
