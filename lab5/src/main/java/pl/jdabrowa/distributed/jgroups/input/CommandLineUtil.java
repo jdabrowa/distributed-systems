@@ -25,4 +25,8 @@ public class CommandLineUtil {
         System.out.println("\tlist\t|\tWypisuje listę dostępnych kanałów i zapisanych do nich użytkowników");
         System.out.println("\texit\t|\tKończy pracę");
     }
+
+    public boolean shouldContinue(String line) {
+        return !"exit".equals(line.toLowerCase());
+    }
 }
