@@ -1,4 +1,4 @@
-package pl.jdabrowa.distributed.jgroups.communication;
+package pl.jdabrowa.distributed.jgroups.listeners;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.jgroups.Address;
@@ -29,7 +29,7 @@ public class ListenerAdapter extends ReceiverAdapter {
             message = ChatMessage.parseFrom(buffer);
             String messageText = message.getMessage();
             String sender = channel.getName(sourceAddress);
-            LOGGER.info("{}> {}", sender, messageText);
+            LOGGER.info("[{}]{}> {}",channel.getAddressAsString(), sender, messageText);
         } catch (InvalidProtocolBufferException e) {
             LOGGER.warn("Message parsing error", e);
         }

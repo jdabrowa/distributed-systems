@@ -5,8 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.jdabrowa.distributed.jgroups.IChat;
+import pl.jdabrowa.distributed.jgroups.state.ChannelState;
+import pl.jdabrowa.distributed.jgroups.chat.Chat;
+import pl.jdabrowa.distributed.jgroups.chat.IChat;
 import pl.jdabrowa.distributed.jgroups.input.error.InputException;
+
+import java.util.Map;
 
 @Component
 public class UserActionFactory {
@@ -36,6 +40,10 @@ public class UserActionFactory {
             return new JoinChannelAction(extractAfter(line, UserInstructions.JOIN_INSTRUCTION));
         } else if(line.startsWith(UserInstructions.SEND_INSTRUCTION)) {
             return new SendAction(extractAfter(line, UserInstructions.SEND_INSTRUCTION));
+        } else if(line.toLowerCase().startsWith(UserInstructions.LIST_INSTRUCTION)) {
+            return new ListAction();
+        } else if (line.toLowerCase().startsWith(UserInstructions.EXIT_INSTRUCTION)) {
+            return EMPTY_ACTION;
         } else {
             LOGGER.warn("Unknown action, type 'help' to list available commands");
             return EMPTY_ACTION;
@@ -84,6 +92,20 @@ public class UserActionFactory {
                 chat.sendMessage(text);
             } catch (Exception e) {
                 LOGGER.warn("Cannot send message", e);
+            }
+        }
+    }
+
+    private final class ListAction implements UserAction {
+
+        @Override
+        public void execute() {
+            Map<String, ChannelState> channelStateMap = ((Chat) chat).getUserRepository().getChannelStateMap();
+            for(ChannelState state : channelStateMap.values()) {
+                System.out.println(state.getName() + ":");
+                for(String user : state.getUsers()) {
+                    System.out.println("\t" + user);
+                }
             }
         }
     }

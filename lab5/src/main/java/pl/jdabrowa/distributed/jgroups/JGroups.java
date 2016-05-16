@@ -1,6 +1,5 @@
 package pl.jdabrowa.distributed.jgroups;
 
-import jdk.nashorn.internal.runtime.ListAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.jgroups.JChannel;
 import org.jgroups.Receiver;
@@ -8,7 +7,9 @@ import org.jgroups.protocols.*;
 import org.jgroups.protocols.pbcast.*;
 import org.jgroups.stack.ProtocolStack;
 import org.springframework.stereotype.Component;
-import pl.jdabrowa.distributed.jgroups.communication.ListenerAdapter;
+import pl.jdabrowa.distributed.jgroups.listeners.ListenerAdapter;
+import pl.jdabrowa.distributed.jgroups.listeners.ManagementAdapter;
+import pl.jdabrowa.distributed.jgroups.state.UserRepository;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -46,6 +47,10 @@ public class JGroups {
 
     public Receiver newReceiverFor(JChannel channel) {
         return new ListenerAdapter(channel);
+    }
+
+    public Receiver newManagementChannelReceiver(UserRepository userRepository) {
+        return new ManagementAdapter(userRepository);
     }
 
     private UDP createUDP(String channelNumber) throws UnknownHostException {
