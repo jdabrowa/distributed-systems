@@ -14,8 +14,8 @@ import pl.jdabrowa.distributed.jgroups.JGroups;
 import pl.jdabrowa.distributed.jgroups.configuration.ChatClientConfiguration;
 import pl.jdabrowa.distributed.jgroups.state.UserRepository;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -28,7 +28,7 @@ public class Chat implements IChat {
     public static final long TIMEOUT_SECONDS = 10;
 
     private final JGroups jGroups;
-    private final Set<JChannel> chatChannels;
+    private final Map<String, JChannel> chatChannels;
     private final JChannel managementChannel;
 
     @Getter
@@ -39,7 +39,7 @@ public class Chat implements IChat {
     @Autowired
     public Chat(JGroups jGroups, UserRepository userRepository, ChatClientConfiguration configuration) throws Exception {
         this.jGroups = jGroups;
-        this.chatChannels = new HashSet<>();
+        this.chatChannels = new HashMap<>();
         nickName = configuration.getUserName();
         this.userRepository = userRepository;
         this.managementChannel = createAndJoinManagementChannel();
@@ -57,7 +57,7 @@ public class Chat implements IChat {
                 .setMessage(messageText)
                 .build();
 
-        for(JChannel channel : chatChannels) {
+        for(JChannel channel : chatChannels.values()) {
             channel.send(new Message(null, null, chatMessage.toByteArray()));
         }
     }
@@ -75,6 +75,15 @@ public class Chat implements IChat {
         return managementChannel;
     }
 
+    @Override
+    public void leaveChannel(String channelNumber) throws Exception {
+        JChannel channel = chatChannels.get(channelNumber);
+        if(null != channel) {
+            registerAndBroadcastLeave(channelNumber);
+            chatChannels.remove(channelNumber);
+        }
+    }
+
     private void createAndConnectToChannel(String channelNumber) throws Exception {
         JChannel channel = jGroups.newJChannel();
         ProtocolStack protocolStack = jGroups.createRequiredProtocolStack(channelNumber);
@@ -82,7 +91,7 @@ public class Chat implements IChat {
         channel.setName(nickName);
         channel.setReceiver(jGroups.newReceiverFor(channel));
         channel.connect(channelNumber);
-        chatChannels.add(channel);
+        chatChannels.put(channelNumber, channel);
     }
 
     private void registerAndBroadcastJoin(String channelNumber) throws Exception {
@@ -95,6 +104,20 @@ public class Chat implements IChat {
         Message message = new Message(null, null, chatAction.toByteArray());
         synchronized (userRepository) {
             userRepository.doJoin(chatAction);
+        }
+        managementChannel.send(message);
+    }
+
+    private void registerAndBroadcastLeave(String channelNumber) throws Exception {
+        ChatAction chatAction = ChatAction.newBuilder()
+                .setAction(ChatAction.ActionType.LEAVE)
+                .setNickname(nickName)
+                .setChannel(channelNumber)
+                .build();
+
+        Message message = new Message(null, null, chatAction.toByteArray());
+        synchronized (userRepository) {
+            userRepository.doLeave(chatAction);
         }
         managementChannel.send(message);
     }

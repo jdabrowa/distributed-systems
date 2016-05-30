@@ -44,6 +44,8 @@ public class UserActionFactory {
             return new ListAction();
         } else if (line.toLowerCase().startsWith(UserInstructions.EXIT_INSTRUCTION)) {
             return EMPTY_ACTION;
+        } else if (line.toLowerCase().startsWith(UserInstructions.LEAVE_INSTRUCTION)) {
+            return new LeaveAction(extractAfter(line, UserInstructions.LEAVE_INSTRUCTION))
         } else {
             LOGGER.warn("Unknown action, type 'help' to list available commands");
             return EMPTY_ACTION;
@@ -112,5 +114,15 @@ public class UserActionFactory {
 
     private boolean isInValidRange(int number) {
         return number > 0 && number <= 200;
+    }
+
+    private class LeaveAction implements UserAction {
+        public LeaveAction(String s) {
+        }
+
+        @Override
+        public void execute() {
+
+        }
     }
 }

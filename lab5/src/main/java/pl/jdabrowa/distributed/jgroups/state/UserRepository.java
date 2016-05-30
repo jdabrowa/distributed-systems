@@ -3,7 +3,6 @@ package pl.jdabrowa.distributed.jgroups.state;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import pl.edu.agh.dsrg.sr.chat.protos.ChatOperationProtos;
-import pl.jdabrowa.distributed.jgroups.state.ChannelState;
 
 import java.util.HashMap;
 import java.util.Map;
